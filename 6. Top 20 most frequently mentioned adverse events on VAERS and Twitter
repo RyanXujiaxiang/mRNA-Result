@@ -1,0 +1,71 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+df1 = pd.read_csv('.AE_twitter')
+df2 = pd.read_csv('.AE_vaers')
+
+import matplotlib.pyplot as plt
+
+df1_top10 = df1.sort_values(by='Count', ascending=False).head(20)
+top10_symptoms = df1_top10['Symptoms'].tolist()
+df2_top10 = df2[df2['Symptoms'].isin(top10_symptoms)]
+df2_top10_ordered = df2_top10.set_index('Symptoms').reindex(top10_symptoms).reset_index()
+
+# Plotting the top 10 symptoms from df1 with bars extending to the left
+fig1, ax1 = plt.subplots(figsize=(4.2, 4))
+ax1.barh(df1_top10['Symptoms'], df1_top10['Count'], color='lightcoral', edgecolor='black')
+ax1.invert_yaxis()
+ax1.invert_xaxis()  # Invert the x-axis to reverse the bar direction
+plt.tight_layout()
+for spine in ['top', 'right', 'left']:
+    ax1.spines[spine].set_visible(False)
+ax1.tick_params(axis='y', left=False, labelleft=False)  # Remove y-axis tick marks
+#fig1.text(0.5, 0, 'Twitter AEs', ha='center', va='top')
+
+# Plotting the counts from df2 for the top 10 symptoms from df1
+fig2, ax2 = plt.subplots(figsize=(4.2, 4))
+ax2.barh(df2_top10_ordered['Symptoms'], df2_top10_ordered['Count'], color='lightblue', edgecolor='black')
+ax2.invert_yaxis()
+plt.tight_layout()
+for spine in ['top', 'right', 'left']:
+    ax2.spines[spine].set_visible(False)
+ax2.tick_params(axis='y', left=False, labelleft=False)  # Remove y-axis tick marks
+#fig2.text(0.5, 0, 'VAERS AEs', ha='center', va='top')
+
+# Show the plots
+plt.show()
+
+import matplotlib.pyplot as plt
+
+df2_top10 = df2.sort_values(by='Count', ascending=False).head(20)
+
+# Find these top 10 symptoms in df1
+df1_filtered = df1[df1['Symptoms'].str.lower().isin(df2_top10['Symptoms'].str.lower())]
+
+# Ensure the order matches df2's top 10 for consistency in comparison
+df1_filtered_ordered = df1_filtered.set_index('Symptoms').reindex(df2_top10['Symptoms'].str.lower()).reset_index()
+
+# Plotting df1 data for df2's top 10 symptoms without y-axis labels and tick marks
+fig1, ax1 = plt.subplots(figsize=(3, 4))
+ax1.barh(df1_filtered_ordered['Symptoms'], df1_filtered_ordered['Count'], color='lightcoral', edgecolor='black')
+ax1.invert_yaxis()
+ax1.invert_xaxis()
+ax1.tick_params(axis='y', left=False, labelleft=False)  # Remove y-axis tick marks and labels
+plt.tight_layout()
+for spine in ['top', 'right', 'left']:
+    ax1.spines[spine].set_visible(False)
+#fig1.text(0.5, 0, 'Twitter AEs', ha='center', va='top')
+
+# Plotting the top 10 symptoms from df2 directly without y-axis labels and tick marks
+fig2, ax2 = plt.subplots(figsize=(3, 4))
+ax2.barh(df2_top10['Symptoms'], df2_top10['Count'], color='lightblue', edgecolor='black')
+ax2.invert_yaxis()
+ax2.tick_params(axis='y', left=False, labelleft=False)  # Remove y-axis tick marks and labels
+plt.tight_layout()
+for spine in ['top', 'right', 'left']:
+    ax2.spines[spine].set_visible(False)
+#fig2.text(0.5, 0, 'VAERS AEs', ha='center', va='top')
+
+# Show the plots
+plt.show()
