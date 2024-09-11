@@ -4,7 +4,6 @@ Code used in the research "Mapping Global Public Perspectives on mRNA Vaccines a
 
 2. The following ChatGPT prompts and code were used to analyze the data in this research:
 
-"""
     system_prompt = """
         I'm monitoring social media discussions to understand public attitudes towards the mRNA technology / vaccine. Please help me classify the provided Twitter post about the mRNA technology / vaccine.
         
