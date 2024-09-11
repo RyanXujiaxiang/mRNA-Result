@@ -1,0 +1,44 @@
+from gensim.test.utils import datapath
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set()
+import pyLDAvis.gensim
+pyLDAvis.enable_notebook()# Visualise inside a notebook
+from gensim.models import LdaMulticore
+from gensim.models import CoherenceModel
+import gensim.corpora as corpora
+from gensim.models import LdaModel
+
+lda = LdaModel.load(".lda_model")
+
+from wordcloud import WordCloud, STOPWORDS
+import matplotlib.pyplot as plt
+import numpy as np
+from PIL import Image
+from collections import Counter
+from ast import literal_eval
+
+topic_words = lda.show_topic(0, topn=20)
+
+word_freq_dict = {word: freq for word, freq in topic_words}
+
+image = Image.open('shape.png')
+image = image.convert("RGBA")
+
+white_bg = Image.new("RGBA", image.size, "white")
+
+mask_img = Image.alpha_composite(white_bg, image)
+
+mask = np.array(mask_img)[:, :, 0]
+
+def get_single_color_func(color):
+    return lambda *args, **kwargs: color
+
+wordcloud = WordCloud(scale=2, max_font_size=25, width=800, height=400, background_color=None, mode='RGBA', mask=mask, contour_width=0, max_words=50, contour_color='white', stopwords=STOPWORDS, collocations=False, color_func=get_single_color_func((92, 188, 229))).generate_from_frequencies(word_freq_dict)
+
+plt.figure(figsize=[10,5], dpi=1000)
+plt.imshow(wordcloud)
+           #interpolation="bilinear"
+plt.axis("off")
+plt.show()
