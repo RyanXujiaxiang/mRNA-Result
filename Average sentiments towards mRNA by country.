@@ -1,6 +1,6 @@
 import plotly.express as px
 
-df = 
+df = pd.read_csv(".data")
 
 us_data = df[df['Country'] == "United States"]
 state_mapping = {"positive": 1, "neutral": 0, "negative": -1}
