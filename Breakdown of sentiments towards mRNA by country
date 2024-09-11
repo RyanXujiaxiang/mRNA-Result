@@ -1,0 +1,28 @@
+import matplotlib.pyplot as plt
+
+df = pd.read_csv(".data")
+
+colors = {
+    "negative": "#F8CCAF",
+    "neutral": "#90ACDD",
+    "positive": "#C6E1B5",
+}
+
+# Reshape data to get counts of sentiments per country
+pivot_df = df.groupby(['Country', 'Predicted_sentiment']).size().unstack().fillna(0)
+
+# Convert counts to percentages
+pivot_df_percentage = pivot_df.divide(pivot_df.sum(axis=1), axis=0) * 100
+
+# Stacked Bar Chart
+fig, ax = plt.subplots(figsize=(10, 3), dpi=500)
+pivot_df_percentage.plot(kind='bar', stacked=True, ax=ax, color = colors)
+#plt.title('Sentiment Analysis by Country (Percentage)')
+plt.ylabel('Percentage of Sentiment (%)', labelpad=20, y=0.1)
+plt.xlabel('Country')
+plt.tight_layout()
+plt.legend(title='Sentiment', bbox_to_anchor=(1.05, 1), loc='upper left')
+
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+plt.show()
