@@ -1,0 +1,58 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+import numpy as np
+from matplotlib.ticker import NullLocator
+
+df = pd.read_csv("    ")
+
+colors = {
+    "negative": "#F8CCAF",
+    "neutral": "#90ACDD",
+    "positive": "#C6E1B5",
+}
+
+df['Date'] = pd.to_datetime(df['Date'])
+
+grouped = df.groupby([df['Date'].dt.to_period('D'), 'Predicted_sentiment']).size().unstack().fillna(0)
+
+grouped['Total'] = grouped.sum(axis=1)
+#grouped['Positivity'] = (grouped['positive'] - grouped['negative']) / grouped['Total']
+grouped['Positivity'] = (grouped['positive'] * 1 + grouped['neutral'] * 0 + grouped['negative'] * -1) / grouped['Total']
+
+fig, ax1 = plt.subplots(figsize=(15,8), dpi=500)
+grouped[['positive', 'neutral', 'negative']].plot.area(ax=ax1, stacked=True, color=colors)
+ax1.spines['top'].set_visible(False)
+ax1.spines['right'].set_visible(False)
+ax2 = ax1.twinx()
+ax2.spines['top'].set_visible(False)
+ax2.spines['right'].set_visible(False)
+
+from matplotlib.lines import Line2D
+legend_elements = [Line2D([0], [0], color=colors["positive"], lw=4, label='Positive'),
+                   Line2D([0], [0], color=colors["neutral"], lw=4, label='Neutral'),
+                   Line2D([0], [0], color=colors["negative"], lw=4, label='Negative'),
+                   Line2D([0], [0], color='black', lw=4, label='Average Sentiment Score')]
+ax1.legend(handles=legend_elements, loc='lower center', ncol=4, bbox_to_anchor=(0.5, -0.3))
+ax1.set_ylabel('Amount of sentiment tweets')
+ax1.yaxis.set_ticks_position('none')
+
+ax2.set_yticks([0, -0.2, -0.4, -0.6, -0.8])
+
+ax2.set_ylim(-0.9, 0.2)
+
+grouped['Positivity'].plot(ax=ax2, color='black', label='Average Sentiment Score', linewidth=1.5)
+ax2.axhline(0, color='gray', linestyle='--')
+ax2.set_ylabel('Average Sentiment Score')
+ax2.yaxis.set_ticks_position('none')
+
+ax1.set_xlim(min(df['Date']), max(df['Date']))
+ax1.xaxis.set_major_locator(mdates.WeekdayLocator(interval=2))
+ax1.xaxis.set_major_formatter(mdates.DateFormatter('%-d %b %Y'))
+
+ax1.xaxis.set_minor_locator(NullLocator())
+
+plt.setp(ax1.get_xticklabels(), rotation=90, ha="center")
+plt.tight_layout()
+plt.savefig('sentiment_analysis_plot.png', dpi=300)
+plt.show()
